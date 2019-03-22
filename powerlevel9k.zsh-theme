@@ -741,13 +741,17 @@ prompt_command_execution_time() {
 ################################################################
 # Determine the unique path - this is needed for the
 # truncate_to_unique strategy.
-#
+# Requires $PWD and $1 to be the same directories
+# ($1 can be tilde-shortened)
 function getUniqueFolder() {
-  local trunc_path directory test_dir test_dir_length
+  local directory test_dir test_dir_length
   local -a matching
   local -a paths
-  local cur_path='/'
-  paths=(${(s:/:)1})
+  # get uncontracted version of ~named
+  local cur_path="${PWD%${1#*/}}"
+  # start with ~named
+  local trunc_path="${1%%/*}"
+  paths=(${(s:/:)${PWD#$cur_path}})
   for directory in ${paths[@]}; do
     test_dir=''
     for (( i=0; i < ${#directory}; i++ )); do
@@ -757,10 +761,10 @@ function getUniqueFolder() {
         break
       fi
     done
-    trunc_path+="$test_dir/"
+    trunc_path+="/$test_dir"
     cur_path+="$directory/"
   done
-  echo "${trunc_path: : -1}"
+  echo "${trunc_path}"
 }
 
 ################################################################

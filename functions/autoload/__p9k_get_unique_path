@@ -16,14 +16,18 @@ setopt localoptions # extendedglob
 #   Given a directory path, determine the unique path.
 ##
 # @args
-#   $1 string The directory path to be truncated.
+#   $1 string The path to be truncated (can be tilde-collapsed).
+#   $2 string The absolute path of $1
 ##
 # @function __p9k_get_unique_path() {}
-local trunc_path directory test_dir test_dir_length
+local directory test_dir test_dir_length
 local -a matching
 local -a paths
-local cur_path='/'
-paths=(${(s:/:)1})
+# prefix of absolute path
+local cur_path="${2%${1#*/}}/"
+# prefix of tilde-collapsed path
+local trunc_path="${1%%/*}"
+paths=( ${(s:/:)${2#$cur_path}} )
 for directory in ${paths[@]}; do
   test_dir=''
   for (( i=0; i < ${#directory}; i++ )); do

@@ -841,11 +841,8 @@ prompt_dir() {
         truncate_to_unique)
           # for each parent path component find the shortest unique beginning
           # characters sequence. Source: https://stackoverflow.com/a/45336078
-          if (( ${#current_path} > 1 )); then # root and home are exceptions and won't have paths
-            # cheating here to retain ~ as home folder
-            local home_path="$(getUniqueFolder $HOME)"
-            trunc_path="$(getUniqueFolder $PWD)"
-            [[ $current_path == "~"* ]] && current_path="~${trunc_path//${home_path}/}" || current_path="/${trunc_path}"
+          if [[ $current_path == *'/'?* ]]; then # We aren't in the root of a named dir or in /
+            current_path="$(getUniqueFolder "$current_path")"
           fi
         ;;
         truncate_with_folder_marker)

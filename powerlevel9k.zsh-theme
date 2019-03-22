@@ -775,7 +775,7 @@ function getUniqueFolder() {
 set_default POWERLEVEL9K_DIR_PATH_SEPARATOR "/"
 set_default POWERLEVEL9K_HOME_FOLDER_ABBREVIATION "~"
 set_default POWERLEVEL9K_DIR_PATH_HIGHLIGHT_BOLD false
-set_default POWERLEVEL9K_DIR_PATH_ABSOLUTE false
+set_default POWERLEVEL9K_DIR_PROMPT_SEQUENCE '%~'
 set_default POWERLEVEL9K_DIR_SHOW_WRITABLE false
 set_default POWERLEVEL9K_DIR_OMIT_FIRST_CHARACTER false
 set_default POWERLEVEL9K_SHORTEN_STRATEGY ""
@@ -785,13 +785,10 @@ set_default POWERLEVEL9K_SHORTEN_FOLDER_MARKER ".shorten_folder_marker"
 set_default -i POWERLEVEL9K_SHORTEN_DIR_LENGTH -1
 set_default -a POWERLEVEL9K_DIR_PACKAGE_FILES package.json composer.json
 prompt_dir() {
-  # using $PWD instead of "$(print -P '%~')" to allow use of POWERLEVEL9K_DIR_PATH_ABSOLUTE
-  local current_path=$PWD # WAS: local current_path="$(print -P '%~')"
+  local current_path="${(%)POWERLEVEL9K_DIR_PROMPT_SEQUENCE}"
   [[ "${POWERLEVEL9K_DIR_SHOW_WRITABLE}" == true && ! -w "$PWD" ]]
   local -i writable=$?
   if ! _p9k_cache_get "$0" "$2" "$current_path" "$writable"; then
-    # check if the user wants to use absolute paths or "~" paths
-    [[ ${(L)POWERLEVEL9K_DIR_PATH_ABSOLUTE} != "true" ]] && current_path=${current_path/#$HOME/"~"}
     # declare all local variables
     local paths directory test_dir test_dir_length trunc_path threshhold
     # if we are not in "~" or "/", split the paths into an array and exclude "~"
